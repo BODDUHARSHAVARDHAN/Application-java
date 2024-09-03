@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # Variables
-JAR_PATH="/opt/java-app"
+JAR_PATH="/opt/java"
 SYMLINK_LATEST="${JAR_PATH}/demo-latest.jar"
 SYMLINK_PREVIOUS="${JAR_PATH}/demo-previous.jar"
-SERVICE_FILE="/etc/systemd/system/java-app.service"
+SERVICE_FILE="/etc/systemd/system/java.service"
 
 # Function to update systemd configuration
 update_systemd_config() {
@@ -26,7 +26,7 @@ WantedBy=multi-user.target
 EOL
 
     sudo -n systemctl daemon-reload
-    sudo -n systemctl enable java-app.service
+    sudo -n systemctl enable java.service
 }
 
 # Deployment logic
