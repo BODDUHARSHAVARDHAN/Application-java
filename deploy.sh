@@ -40,4 +40,4 @@ sudo -n ln -sf ${NEW_JAR} ${SYMLINK_LATEST}  # Set new jar as the latest
 update_systemd_config ${SYMLINK_LATEST}
 
 # Start or restart the service
-sudo -n systemctl restart java-app.service
+sudo -n systemctl restart java.service
