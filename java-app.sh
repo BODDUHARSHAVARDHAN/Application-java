@@ -17,8 +17,9 @@ Description=Java Application Service
 After=network.target
 
 [Service]
-ExecStart=/usr/bin/java -jar ${jar_file}
+ExecStart=/usr/bin/java -jar /opt/java-app/demo-latest.jar
 User=harsha
+SuccessExitStatus=143
 Restart=always
 
 [Install]
