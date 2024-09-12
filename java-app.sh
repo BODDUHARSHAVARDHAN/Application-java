@@ -5,7 +5,7 @@ JAR_PATH="/opt/java-app"
 SYMLINK_LATEST="${JAR_PATH}/demo-latest.jar"
 SYMLINK_PREVIOUS="${JAR_PATH}/demo-previous.jar"
 SERVICE_FILE="/etc/systemd/system/java-app.service"
-TIMESTAMP=$(date +'%Y%m%d%H%M%S')  # Generate a unique timestamp
+JAR_NAME=$1  # Full JAR file name passed as an argument
 
 # Function to update systemd configuration
 update_systemd_config() {
@@ -28,22 +28,12 @@ WantedBy=multi-user.target
 EOL
 
     sudo -n systemctl daemon-reload
-    if [[ $? -ne 0 ]]; then
-        echo "Failed to reload systemd daemon. Exiting."
-        exit 1
-    fi
-
     sudo -n systemctl enable java-app.service
-    if [[ $? -ne 0 ]]; then
-        echo "Failed to enable the java-app.service. Exiting."
-        exit 1
-    fi
 }
 
-# Function to deploy a new version with a timestamp
+# Function to deploy a new version
 deploy_new_version() {
-    local version=$1
-    local new_jar="${JAR_PATH}/demo-${version}-${TIMESTAMP}.jar"
+    local new_jar="${JAR_PATH}/${JAR_NAME}"
 
     if [ ! -f "$new_jar" ]; then
         echo "Error: JAR file $new_jar does not exist!"
@@ -71,37 +61,18 @@ deploy_new_version() {
     update_systemd_config ${SYMLINK_LATEST}
 }
 
-# Function to rollback to the previous version
-rollback_version() {
+# Main logic
+if [ "$1" == "rollback" ]; then
     echo "Rolling back to previous version..."
-    
     if [ ! -L "$SYMLINK_PREVIOUS" ]; then
         echo "Error: No previous version found for rollback!"
         exit 1
     fi
-
-    # Switch latest to the previous version
     sudo -n ln -sf ${SYMLINK_PREVIOUS} ${SYMLINK_LATEST}
-    if [[ $? -ne 0 ]]; then
-        echo "Failed to switch to previous version. Exiting."
-        exit 1
-    fi
-
     update_systemd_config ${SYMLINK_LATEST}
-}
-
-# Main logic
-if [ "$1" == "rollback" ]; then
-    rollback_version
 else
     deploy_new_version $1
 fi
 
 # Start or restart the service
 sudo -n systemctl restart java-app.service
-if [[ $? -ne 0 ]]; then
-    echo "Failed to restart the service. Exiting."
-    exit 1
-fi
-
-echo "Service restarted successfully."
