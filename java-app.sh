@@ -76,5 +76,3 @@ fi
 
 # Start or restart the service
 sudo -n systemctl restart java-app.service
-
-
